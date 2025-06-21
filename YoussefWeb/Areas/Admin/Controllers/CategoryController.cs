@@ -2,18 +2,20 @@
 using Youssef.DataAccess.Repository.IRepository;
 using Youssef.Models;
 
-namespace YoussefWeb.Controllers
+namespace YoussefWeb.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class CategoryController : Controller
     {
-        private readonly ICategoryRepository _CategoryRepo;
-        public CategoryController(ICategoryRepository CategoryRepo)
+        
+        private readonly IUnitOfWork _unitofwork;
+        public CategoryController(IUnitOfWork unitOfWork)
         {
-            _CategoryRepo = CategoryRepo;
+            _unitofwork = unitOfWork;
         }
         public IActionResult Index()
         {
-            List<Category> objCategoryList = _CategoryRepo.GetAll().ToList();
+            List<Category> objCategoryList = _unitofwork.Category.GetAll().ToList();
             return View(objCategoryList);
         }
 
@@ -34,8 +36,8 @@ namespace YoussefWeb.Controllers
             //}
             if (ModelState.IsValid)
             {
-                _CategoryRepo.Add(obj);
-                _CategoryRepo.save();
+                _unitofwork.Category.Add(obj);
+                _unitofwork.save();
                 TempData["Success"] = "the category is added successfully";
                 return RedirectToAction("Index");
             }
@@ -48,7 +50,7 @@ namespace YoussefWeb.Controllers
             {
                 return NotFound();
             }
-            Category? categoryfromDb = _CategoryRepo.Get(u => u.CategoryID == Id);
+            Category? categoryfromDb = _unitofwork.Category.Get(u => u.CategoryID == Id);
             //Category? categoryfromDb2 = _Db.Categories.FirstOrDefault(u=>u.CategoryID==Id);
             //Category? categoryfromDb3 = _Db.Categories.Where(u => u.CategoryID == Id).FirstOrDefault();
             if (categoryfromDb == null)
@@ -62,8 +64,8 @@ namespace YoussefWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                _CategoryRepo.update(obj);
-                _CategoryRepo.save();
+                _unitofwork.Category.update(obj);
+                _unitofwork.save();
                 TempData["Success"] = "the category is updated successfully";
                 return RedirectToAction("Index");
             }
@@ -76,7 +78,7 @@ namespace YoussefWeb.Controllers
             {
                 return NotFound();
             }
-            Category? categoryfromDb = _CategoryRepo.Get(u => u.CategoryID == Id);
+            Category? categoryfromDb = _unitofwork.Category.Get(u => u.CategoryID == Id);
             if (categoryfromDb == null)
             {
                 return NotFound();
@@ -86,13 +88,13 @@ namespace YoussefWeb.Controllers
         [HttpPost,ActionName("Delete")]
         public IActionResult DeletePost(int? Id)
         {
-            Category? obj = _CategoryRepo.Get(u=>u.CategoryID==Id);
+            Category? obj = _unitofwork.Category.Get(u=>u.CategoryID==Id);
             if (obj == null)
             {
                 return NotFound();
             }
-            _CategoryRepo.Remove(obj);
-            _CategoryRepo.save();
+            _unitofwork.Category.Remove(obj);
+            _unitofwork.save();
             TempData["Success"] = "the category is deleted successfully";
             return RedirectToAction("Index");
         }

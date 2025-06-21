@@ -1,26 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Youssef.DataAccess.Data;
 using Youssef.DataAccess.Repository.IRepository;
-using Youssef.Models;
 
 namespace Youssef.DataAccess.Repository
 {
-    public class CategoryRepository : Repository<Category> , ICategoryRepository
+    public class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDbContext _Db;
-        public CategoryRepository(ApplicationDbContext Db) : base(Db)
+        public ICategoryRepository Category {  get; private set; } 
+        public UnitOfWork(ApplicationDbContext Db)
         {
             _Db = Db;
-        }    
+            Category = new CategoryRepository(_Db);
+        }
 
-        public void update(Category obj)
+        public void save()
         {
-            _Db.Categories.Update(obj);
+            _Db.SaveChanges();
         }
     }
 }
