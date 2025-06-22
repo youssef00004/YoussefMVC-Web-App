@@ -12,10 +12,12 @@ namespace Youssef.DataAccess.Repository
     {
         private readonly ApplicationDbContext _Db;
         public ICategoryRepository Category {  get; private set; } 
+        public IProductRepository Product { get; private set; }
         public UnitOfWork(ApplicationDbContext Db)
         {
             _Db = Db;
             Category = new CategoryRepository(_Db);
+            Product = new ProductRepository(_Db);
         }
 
         public void save()
