@@ -19,7 +19,25 @@ namespace Youssef.DataAccess.Repository
 
         public void update(Product obj)
         {
-            _Db.Products.Update(obj);
+            var objFromDb = _Db.Products.FirstOrDefault(u => u.ProductID == obj.ProductID);
+            if (objFromDb != null)
+            {
+                objFromDb.Title = obj.Title;
+                objFromDb.ISBN = obj.ISBN;
+                objFromDb.Price = obj.Price;
+                objFromDb.Price50 = obj.Price50;
+                objFromDb.Price100 = obj.Price100;
+                objFromDb.ListPrice = obj.ListPrice;
+                objFromDb.Description = obj.Description;
+                objFromDb.CategoryID = obj.CategoryID;
+                objFromDb.Author = obj.Author;
+
+                //explicity determine the update method
+                if (obj.ImageURL != null)
+                {
+                    objFromDb.ImageURL = obj.ImageURL;
+                }
+            }
         }
     }
 }

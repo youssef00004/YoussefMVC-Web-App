@@ -10,9 +10,11 @@ namespace YoussefWeb.Areas.Admin.Controllers
     public class ProductController : Controller
     {
         private readonly IUnitOfWork _unitofwork;
-        public ProductController(IUnitOfWork unitOfWork)
+        private readonly IWebHostEnvironment _webhostenvironment; 
+        public ProductController(IUnitOfWork unitOfWork , IWebHostEnvironment webHostEnvironment)
         {
             _unitofwork = unitOfWork;
+            _webhostenvironment = webHostEnvironment;
         }
         public IActionResult Index()
         {
@@ -50,7 +52,42 @@ namespace YoussefWeb.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                _unitofwork.Product.Add(productVM.Product);
+                string wwwRootPath = _webhostenvironment.WebRootPath;
+                if (file != null)
+                {
+                    string filename = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    string productPath = Path.Combine(wwwRootPath, @"images\product");
+
+                    if(!string.IsNullOrEmpty(productVM.Product.ImageURL))
+                    {
+                        //delete the old image
+                        var OldImagePath
+                            = Path.Combine(wwwRootPath, productVM.Product.ImageURL.TrimStart('\\'));
+
+                        if (System.IO.File.Exists(OldImagePath))
+                        {
+                            System.IO.File.Delete(OldImagePath);
+                        }
+                    }
+
+                    using (var fileStream = new FileStream(Path.Combine(productPath, filename), FileMode.Create))
+                    {
+                        file.CopyTo(fileStream);
+                    }
+
+                    productVM.Product.ImageURL = @"\images\product\" + filename;
+
+                }
+
+                if (productVM.Product.ProductID == 0)
+                {
+                    _unitofwork.Product.Add(productVM.Product);
+                }
+                else
+                {
+                    _unitofwork.Product.update(productVM.Product);
+                }
+
                 _unitofwork.save();
                 TempData["Success"] = "the product is added successfully";
                 return RedirectToAction("Index");
