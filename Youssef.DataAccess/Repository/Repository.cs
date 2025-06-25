@@ -21,22 +21,38 @@ namespace Youssef.DataAccess.Repository
         {
             _Db = Db;
             this.dbSet = _Db.Set<T>();
+            _Db.Products.Include(u => u.Category).Include(u => u.CategoryID);
         }
         public void Add(T entity)
         {
             dbSet.Add(entity);
         }
 
-        public T Get(Expression<Func<T, bool>> filter)
+        public T Get(Expression<Func<T, bool>> filter , string? includeProperties = null)
         {
             IQueryable<T> query = dbSet;
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (var includeprop in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(includeprop);
+                }
+            }
             query = query.Where(filter);
             return query.FirstOrDefault();
         }
 
-        public IEnumerable<T> GetAll()
+        //Category , any other class to include from  ----here they are separted by commas---- 
+        public IEnumerable<T> GetAll(string? includeProperties = null)
         {
             IQueryable<T> query = dbSet;
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (var includeprop in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(includeprop);
+                }
+            }
             return query.ToList();
 
         }

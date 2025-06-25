@@ -18,7 +18,7 @@ namespace YoussefWeb.Areas.Admin.Controllers
         }
         public IActionResult Index()
         {
-            List<Product> objProductList = _unitofwork.Product.GetAll().ToList();
+            List<Product> objProductList = _unitofwork.Product.GetAll(includeProperties:"Category").ToList();
             return View(objProductList);
         }
 
@@ -131,5 +131,15 @@ namespace YoussefWeb.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
-    }
+
+        #region API CALLS
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            List<Product> objProductList = _unitofwork.Product.GetAll(includeProperties: "Category").ToList();
+            return Json(new { data = objProductList });
+        }
+            #endregion
+
+        }
 }
