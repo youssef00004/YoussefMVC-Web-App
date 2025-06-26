@@ -46,8 +46,8 @@ namespace Youssef.Models
         public int CategoryID { get; set; }
         [ForeignKey("CategoryID")]
         [ValidateNever]
-        public Category Category { get; set; }
+        public Category? Category { get; set; }
         [ValidateNever]
-        public string ImageURL { get; set; }
+        public string? ImageURL { get; set; }
     }
 }
