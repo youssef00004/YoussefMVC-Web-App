@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Youssef.DataAccess.Data;
 
@@ -11,9 +12,11 @@ using Youssef.DataAccess.Data;
 namespace Youssef.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250630144751_UpdateNameToString")]
+    partial class UpdateNameToString
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -270,75 +273,6 @@ namespace Youssef.DataAccess.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Youssef.Models.Company", b =>
-                {
-                    b.Property<int>("CompanyId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CompanyId"));
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PostalCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("State")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("StreetAddress")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("CompanyId");
-
-                    b.ToTable("Companies");
-
-                    b.HasData(
-                        new
-                        {
-                            CompanyId = 1,
-                            City = "Tech City",
-                            Name = "Tech solution",
-                            PhoneNumber = "6666999900",
-                            PostalCode = "12312312",
-                            State = "IL",
-                            StreetAddress = "123 tech st"
-                        },
-                        new
-                        {
-                            CompanyId = 2,
-                            City = "Vid City",
-                            Name = "Vivid Books",
-                            PhoneNumber = "7777888000",
-                            PostalCode = "3425435",
-                            State = "HW",
-                            StreetAddress = "999 vid street"
-                        },
-                        new
-                        {
-                            CompanyId = 3,
-                            City = "lala land",
-                            Name = "Readers club",
-                            PhoneNumber = "888222211100",
-                            PostalCode = "56756756",
-                            State = "NY",
-                            StreetAddress = "999 main street"
-                        });
-                });
-
             modelBuilder.Entity("Youssef.Models.Product", b =>
                 {
                     b.Property<int>("ProductID")
@@ -494,11 +428,6 @@ namespace Youssef.DataAccess.Migrations
                     b.Property<string>("StreetAddress")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("companyID")
-                        .HasColumnType("int");
-
-                    b.HasIndex("companyID");
-
                     b.HasDiscriminator().HasValue("ApplicationUser");
                 });
 
@@ -562,15 +491,6 @@ namespace Youssef.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
-                });
-
-            modelBuilder.Entity("Youssef.Models.ApplicationUser", b =>
-                {
-                    b.HasOne("Youssef.Models.Company", "Company")
-                        .WithMany()
-                        .HasForeignKey("companyID");
-
-                    b.Navigation("Company");
                 });
 #pragma warning restore 612, 618
         }

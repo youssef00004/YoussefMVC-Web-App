@@ -14,10 +14,22 @@ namespace Youssef.DataAccess.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        public DbSet<Company> Companies { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+
+
+            modelBuilder.Entity<Company>().HasData(
+                new Company { CompanyId = 1, Name = "Tech solution", StreetAddress = "123 tech st" ,City="Tech City" , PhoneNumber="6666999900" , PostalCode="12312312" , State="IL"},
+                new Company { CompanyId = 2, Name = "Vivid Books", StreetAddress = "999 vid street", City = "Vid City" , PhoneNumber = "7777888000", PostalCode = "3425435", State = "HW" },
+                new Company { CompanyId = 3, Name = "Readers club", StreetAddress = "999 main street", City = "lala land", PhoneNumber = "888222211100", PostalCode = "56756756", State = "NY" }
+            );
+
+
+
 
             modelBuilder.Entity<Category>().HasData(
                 new Category { CategoryID = 1, Name = "Action", DisplayOrder = 1 },

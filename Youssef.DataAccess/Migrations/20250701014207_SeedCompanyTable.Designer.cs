@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Youssef.DataAccess.Data;
 
@@ -11,9 +12,11 @@ using Youssef.DataAccess.Data;
 namespace Youssef.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250701014207_SeedCompanyTable")]
+    partial class SeedCompanyTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -494,11 +497,6 @@ namespace Youssef.DataAccess.Migrations
                     b.Property<string>("StreetAddress")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("companyID")
-                        .HasColumnType("int");
-
-                    b.HasIndex("companyID");
-
                     b.HasDiscriminator().HasValue("ApplicationUser");
                 });
 
@@ -562,15 +560,6 @@ namespace Youssef.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
-                });
-
-            modelBuilder.Entity("Youssef.Models.ApplicationUser", b =>
-                {
-                    b.HasOne("Youssef.Models.Company", "Company")
-                        .WithMany()
-                        .HasForeignKey("companyID");
-
-                    b.Navigation("Company");
                 });
 #pragma warning restore 612, 618
         }
