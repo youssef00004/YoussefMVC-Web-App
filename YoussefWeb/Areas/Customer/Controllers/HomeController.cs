@@ -2,6 +2,8 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Youssef.Models;
 using Youssef.DataAccess.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace YoussefWeb.Areas.Customer.Controllers
 {
@@ -23,12 +25,42 @@ namespace YoussefWeb.Areas.Customer.Controllers
             return View(productList);
         }
 
-        public IActionResult Details(int? id)
+        public IActionResult Details(int id)
         {
-            Product product = _unitOfWork.Product.Get(u=>u.ProductID==id,includeProperties: "Category");
-            return View(product);
+            ShoppingCart shoppingCart = new ShoppingCart()
+            {
+                Product = _unitOfWork.Product.Get(u => u.ProductID == id, includeProperties: "Category"),
+                count = 1,
+                ProductID = id
+            };
+
+            return View(shoppingCart);
         }
 
+        [HttpPost]
+        [Authorize]
+        public IActionResult Details(ShoppingCart shoppingCart)
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var UserID = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+            shoppingCart.ApplicationUserID=UserID;
+
+            ShoppingCart cartfromdb = _unitOfWork.ShoppingCart.Get(u=> u.ApplicationUserID == UserID && u.ProductID == shoppingCart.ProductID);
+            if(cartfromdb != null)
+            {
+                //he already added to cart before
+                cartfromdb.count += shoppingCart.count;
+                _unitOfWork.ShoppingCart.update(cartfromdb);
+            }
+            else
+            {
+               _unitOfWork.ShoppingCart.Add(shoppingCart);
+            }
+            TempData["success"] = "Cart updated successfully";
+            _unitOfWork.save();
+
+            return RedirectToAction(nameof(Index));
+        }
 
         public IActionResult Privacy()
         {

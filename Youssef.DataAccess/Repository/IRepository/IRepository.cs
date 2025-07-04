@@ -11,8 +11,8 @@ namespace Youssef.DataAccess.Repository.IRepository
     {
         // where T can be category or any other class in project
         
-        IEnumerable<T> GetAll(string? includeProperties = null);
-        T Get(Expression<Func<T, bool>> filter , string? includeProperties = null);
+        IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter = null, string? includeProperties = null);
+        T Get(Expression<Func<T, bool>> filter , string? includeProperties = null , bool Tracked = false);
         void Add(T entity);
         void Remove(T entity);
         void RemoveRange(IEnumerable<T> entity);
