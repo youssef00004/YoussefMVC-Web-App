@@ -26,13 +26,13 @@ namespace YoussefWeb.Areas.Customer.Controllers
              ShoppingCartVM = new()
             {
                 ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserID == UserID, includeProperties: "Product"),
-
-            };
+                OrderHeader = new()
+             };
 
             foreach(var shoppingCart in ShoppingCartVM.ShoppingCartList)
             {
                 shoppingCart.price = GetPriceBasedOnQuantity(shoppingCart);
-                ShoppingCartVM.OrderTotal += (shoppingCart.price * shoppingCart.count);
+                ShoppingCartVM.OrderHeader.OrderTotal += (shoppingCart.price * shoppingCart.count);
             }
 
             return View(ShoppingCartVM);
@@ -40,7 +40,29 @@ namespace YoussefWeb.Areas.Customer.Controllers
 
         public IActionResult Summary()
         {
-            return View();
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var UserID = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            ShoppingCartVM = new()
+            {
+                ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserID == UserID, includeProperties: "Product"),
+                OrderHeader = new()
+            };
+
+            ShoppingCartVM.OrderHeader.ApplicationUser = _unitOfWork.ApplicationUser.Get(u => u.Id == UserID);
+            ShoppingCartVM.OrderHeader.Name = ShoppingCartVM.OrderHeader.ApplicationUser.Name;
+            ShoppingCartVM.OrderHeader.PhoneNumber = ShoppingCartVM.OrderHeader.ApplicationUser.PhoneNumber;
+            ShoppingCartVM.OrderHeader.StreetAddress = ShoppingCartVM.OrderHeader.ApplicationUser.StreetAddress;
+            ShoppingCartVM.OrderHeader.City = ShoppingCartVM.OrderHeader.ApplicationUser.City;
+            ShoppingCartVM.OrderHeader.State = ShoppingCartVM.OrderHeader.ApplicationUser.State;
+            ShoppingCartVM.OrderHeader.PostalCode = ShoppingCartVM.OrderHeader.ApplicationUser.PostalCode;
+
+            foreach (var shoppingCart in ShoppingCartVM.ShoppingCartList)
+            {
+                shoppingCart.price = GetPriceBasedOnQuantity(shoppingCart);
+                ShoppingCartVM.OrderHeader.OrderTotal += (shoppingCart.price * shoppingCart.count);
+            }
+            return View(ShoppingCartVM);
         }
 
         public IActionResult Plus (int shoppingcartId)
