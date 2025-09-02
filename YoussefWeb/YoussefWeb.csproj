@@ -24,8 +24,4 @@
     <ProjectReference Include="..\Youssef.Utility\Youssef.Utility.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="wwwroot\images\product\" />
-  </ItemGroup>
-
 </Project>
