@@ -5,6 +5,7 @@ using Youssef.DataAccess.Repository.IRepository;
 using Youssef.Models;
 using Youssef.Models.ViewModels;
 using Youssef.Utility;
+using Stripe.Checkout;
 
 namespace YoussefWeb.Areas.Customer.Controllers
 {
@@ -121,6 +122,42 @@ namespace YoussefWeb.Areas.Customer.Controllers
                 // user is a regular customer and we need to pay now
                 //stripe settings
 
+                var domain = "https://localhost:7169/";
+                var options = new SessionCreateOptions
+                {
+                    SuccessUrl = domain + $"customer/cart/OrderConfirmation?id={ShoppingCartVM.OrderHeader.ApplicationUserId}",
+                    CancelUrl = domain + "customer/cart/index",
+                    LineItems = new List<SessionLineItemOptions>(),
+                    Mode = "payment",
+                };
+
+                foreach (var item in ShoppingCartVM.ShoppingCartList)
+                {
+                    var sessionLineItem = new SessionLineItemOptions
+                    {
+                        PriceData = new SessionLineItemPriceDataOptions
+                        {
+                            UnitAmount = (long)(item.price * 100), //20.00 -> 2000
+                            Currency = "usd",
+                            ProductData = new SessionLineItemPriceDataProductDataOptions
+                            {
+                                Name = item.Product.Title
+                            },
+                        },
+                        Quantity = item.count,
+                    };
+                    options.LineItems.Add(sessionLineItem);
+                }
+
+
+
+
+                var service = new SessionService();
+                Session session = service.Create(options);
+                _unitOfWork.OrderHeader.UpdateStripePaymentId(ShoppingCartVM.OrderHeader.Id, session.Id, session.PaymentIntentId);
+                _unitOfWork.save();
+                Response.Headers.Add("Location", session.Url);
+                return new StatusCodeResult(303);
             }
             else
             {
