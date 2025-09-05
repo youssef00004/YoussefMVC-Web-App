@@ -169,6 +169,26 @@ namespace YoussefWeb.Areas.Customer.Controllers
 
         public IActionResult OrderConfirmation(int id)
         {
+            OrderHeader orderHeader = _unitOfWork.OrderHeader.Get(u => u.Id == id, includeProperties: "ApplicationUser");
+            if(orderHeader.PaymentStatus != SD.PaymentStatusDelayedPayment)
+            {
+                //this is an order by a customer
+                var service = new SessionService();
+                Session session = service.Get(orderHeader.SessionId);
+                //check the stripe status
+                if (session.PaymentStatus.ToLower() == "paid")
+                {
+                    _unitOfWork.OrderHeader.UpdateStripePaymentId(id, session.Id, session.PaymentIntentId);
+                    _unitOfWork.OrderHeader.UpdateStatus(id, SD.StatusApproved, SD.PaymentStatusApproved);
+                    _unitOfWork.save();
+                }
+            }
+            List<ShoppingCart> shoppingCarts = _unitOfWork.ShoppingCart.GetAll
+                (u => u.ApplicationUserID == orderHeader.ApplicationUserId).ToList();
+
+            _unitOfWork.ShoppingCart.RemoveRange(shoppingCarts);
+            _unitOfWork.save();
+
             return View(id);
         }
 
